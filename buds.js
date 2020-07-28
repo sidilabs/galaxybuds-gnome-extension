@@ -4,8 +4,7 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Clutter = imports.gi.Clutter;
-
-const MAC = "B4:1A:1D:C7:BB:B2"
+const Main = imports.ui.main;
 
 function execCommunicate(argv) {
     let flags = (Gio.SubprocessFlags.STDOUT_PIPE |
@@ -39,7 +38,6 @@ var budsBattIndicator = new Lang.Class({
 	Name : "BtGalaxyBudsBattIndicator",
 	Extends: PanelMenu.Button,
 
-
 	_init: function () {
 		Log("Init budsBattIndicator");
 		this.parent(0.0, "btGalaxyBudsBattIndicator");
@@ -66,39 +64,49 @@ var budsBattIndicator = new Lang.Class({
 		this.menu.addMenuItem(this.rightBud);
 		this.menu.addMenuItem(this.leftBud);
 		this.menu.addMenuItem(this.case);
+		Main.panel.addToStatusArea('BtGalaxyBudsBattIndicator', this, 1);
 		this.hide();
-		this.syncBattery();
+		this.enabled = false;
+		//this.syncBattery();
 	},
 
-	syncBattery : function() {
-		let argv = [imports.misc.extensionUtils.getCurrentExtension().path+"/buds_battery.py", MAC];
+	enable(macAdress){
+		if (!this.enabled) {
+			this.show();
+			this.syncBattery(macAdress);
+			this.event = GLib.timeout_add_seconds(0, 30,  () => {
+				this.syncBattery(macAdress);
+				return true;
+			});
+			this.enabled = true;
+		}
+	},
+
+	disable(){
+		if (this.enabled){
+			this.hide();
+			GLib.Source.remove(this.event);
+			this.enabled = false;
+		}
+	},
+
+	syncBattery : function(macAdress) {
+		let argv = [imports.misc.extensionUtils.getCurrentExtension().path+"/buds_battery.py", macAdress+''];
 		execCommunicate(argv).then(result => {
-			if (result.trim()==""){ 
-				var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
-				this.leftBud.label.set_text("Left: " + leftBatt + "%");
-				this.rightBud.label.set_text("Right: " + rightBatt + "%");
-				this.case.label.set_text("Case: " + caseBatt.trimEnd() + "%");
-				if (parseInt(rightBatt) <= parseInt(leftBatt)){
-					this.buttonText.set_text(rightBatt + "%");
-				} else {
-					this.buttonText.set_text(leftBatt + "%");
-				}
-				this.hide();
+			var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
+			[rightBatt, leftBatt, caseBatt] = result.split(','); 
+			this.leftBud.label.set_text("Left: " + leftBatt + "%");
+			this.rightBud.label.set_text("Right: " + rightBatt + "%");
+			this.case.label.set_text("Case: " + caseBatt.trimEnd() + "%");
+			if (parseInt(rightBatt) <= parseInt(leftBatt)){
+				this.buttonText.set_text(rightBatt + "%");
 			} else {
-				var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
-				[rightBatt, leftBatt, caseBatt] = result.split(','); 
-				this.leftBud.label.set_text("Left: " + leftBatt + "%");
-				this.rightBud.label.set_text("Right: " + rightBatt + "%");
-				this.case.label.set_text("Case: " + caseBatt.trimEnd() + "%");
-				if (parseInt(rightBatt) <= parseInt(leftBatt)){
-					this.buttonText.set_text(rightBatt + "%");
-				} else {
-					this.buttonText.set_text(leftBatt + "%");
-				}
-				this.show();
+				this.buttonText.set_text(leftBatt + "%");
 			}
+			
 		}).catch (e => {
 			Log(e);
+			this.hide();
 		});
 	},
 
@@ -107,7 +115,9 @@ var budsBattIndicator = new Lang.Class({
 		this.leftBud.destroy();
 		this.case.destroy();
 		this.buttonText.destroy();
-	}
+	},
+	
+	
 });
 
 var Log = function(msg) {

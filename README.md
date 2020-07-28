@@ -7,7 +7,15 @@ Uses the python script for Galaxy buds from ThePBone (https://github.com/ThePBon
 
 This extension requires Python 3.x!
 
-You need to install PyBluez:
+You also need Bluez and PyBluez:
+
+For bluez on debian based distributions install with:
+
+```
+sudo apt install bluez
+```
+
+To install PyBluez use pip:
 
 ```
 pip install PyBluez

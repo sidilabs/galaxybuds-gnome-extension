@@ -1,11 +1,10 @@
 # DESCRIPTION
-===============
 
 Gnome extension to display a battery indicator for Samsung Galaxy Buds\[+\]. Inspired by keyboard-battery (https://extensions.gnome.org/extension/2170/keyboard-battery/)
 
 Uses the python script for Galaxy buds from ThePBone (https://github.com/ThePBone/GalaxyBuds-BatteryLevel)
 # INSTALLATION
-================
+
 This extension requires Python 3.x!
 
 You need to install PyBluez:
@@ -24,10 +23,9 @@ For now you need to manually put your buds MAC addres in the buds.js file.
 
 
 # TROUBLESHOOTING
-===================
 
+Check gnome-shell log:
 
-     Check gnome-shell log:
       journalctl /usr/bin/gnome-shell | grep budsBattery		# this commmand will dump all gnome-shell log ever record
       journalctl -f /usr/bin/gnome-shell | grep budsBattery		# this will only show new log
 

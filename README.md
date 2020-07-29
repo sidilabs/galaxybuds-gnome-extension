@@ -21,7 +21,6 @@ To install PyBluez use pip:
 pip install PyBluez
 ```
 
-For now you need to manually put your buds MAC addres in the buds.js file.
 
 ## Install from git
    1. From your terminal, go to "~/.local/share/gnome-shell/extensions"

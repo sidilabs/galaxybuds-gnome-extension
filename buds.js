@@ -55,26 +55,42 @@ var budsBattIndicator = new Lang.Class({
 				x_align: Clutter.ActorAlign.START
 		});
 		hbox.add_child(this.buttonText);
-
 		this.add_child(hbox);
-		this.leftBud = new PopupMenu.PopupMenuItem("-- N/A --");
-		this.rightBud = new PopupMenu.PopupMenuItem("-- N/A --");
-		this.case = new PopupMenu.PopupMenuItem("-- N/A --");
-		
-		this.menu.addMenuItem(this.rightBud);
-		this.menu.addMenuItem(this.leftBud);
+		this.case = new PopupMenu.PopupMenuItem("");
+		this.buds = new PopupMenu.PopupMenuItem("");
+		this.buds.add_child(new St.Icon({
+			gicon : Gio.icon_new_for_string(imports.misc.extensionUtils.getCurrentExtension().path+"/icons/left.svg"),
+			icon_size : 32,
+		}));
+		this.leftLabel  = new St.Label({text : 'NA%', y_align: Clutter.ActorAlign.CENTER,});
+		this.buds.add_child(this.leftLabel);
+		this.buds.add_child(new St.Label({text : '   ', y_align: Clutter.ActorAlign.CENTER,}));
+		this.rightLabel  = new St.Label({text : 'NA%', y_align: Clutter.ActorAlign.CENTER,});
+		this.buds.add_child(this.rightLabel);
+		this.buds.add_child(new St.Icon({
+			gicon : Gio.icon_new_for_string(imports.misc.extensionUtils.getCurrentExtension().path+"/icons/right.svg"),
+			icon_size : 32,
+		}));
+		this.case.add_child(new St.Label({text : '       ', y_align: Clutter.ActorAlign.CENTER,}));
+		this.case.add_child(new St.Icon({
+			gicon : Gio.icon_new_for_string(imports.misc.extensionUtils.getCurrentExtension().path+"/icons/case.svg"),
+			icon_size : 45,
+			y_align: Clutter.ActorAlign.CENTER,
+		}));
+		this.caseLabel  = new St.Label({text : 'NA%', y_align: Clutter.ActorAlign.CENTER, x_align: Clutter.ActorAlign.CENTER,});
+		this.case.add_child(this.caseLabel);
+		this.menu.addMenuItem(this.buds);
 		this.menu.addMenuItem(this.case);
 		Main.panel.addToStatusArea('BtGalaxyBudsBattIndicator', this, 1);
 		this.hide();
 		this.enabled = false;
-		//this.syncBattery();
 	},
 
 	enable(macAdress){
 		if (!this.enabled) {
 			this.show();
 			this.syncBattery(macAdress);
-			this.event = GLib.timeout_add_seconds(0, 30,  () => {
+			this.event = GLib.timeout_add_seconds(0, 180,  () => {
 				this.syncBattery(macAdress);
 				return true;
 			});
@@ -95,9 +111,9 @@ var budsBattIndicator = new Lang.Class({
 		execCommunicate(argv).then(result => {
 			var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
 			[rightBatt, leftBatt, caseBatt] = result.split(','); 
-			this.leftBud.label.set_text("Left: " + leftBatt + "%");
-			this.rightBud.label.set_text("Right: " + rightBatt + "%");
-			this.case.label.set_text("Case: " + caseBatt.trimEnd() + "%");
+			this.leftLabel.set_text(leftBatt + "%");
+			this.rightLabel.set_text(rightBatt + "%");
+			this.caseLabel.set_text(caseBatt.trimEnd() + "%");
 			if (parseInt(rightBatt) <= parseInt(leftBatt)){
 				this.buttonText.set_text(rightBatt + "%");
 			} else {

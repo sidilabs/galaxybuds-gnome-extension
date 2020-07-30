@@ -56,7 +56,11 @@ class GalaxyBudsBattery {
         this._connectSignal(this._controller, 'device-inserted', (ctrl, device) => {
 			if (device.name.includes("Galaxy Buds")){
 				Log("Buds inserted event MAC="+device.mac);
-				this.btGalxyBudsBattIndicator.enable(device.mac);
+				if (!device.isConnected){
+					this.btGalxyBudsBattIndicator.disable();
+				} else {
+					this.btGalxyBudsBattIndicator.enable(device.mac);
+				}
 			}
 		});
 		
@@ -76,7 +80,11 @@ class GalaxyBudsBattery {
 			
 			if (device.name.includes("Galaxy Buds")){
 				Log(`Buds deleted event`);
-				this.btGalxyBudsBattIndicator.disable();
+				if (!device.isConnected){
+					this.btGalxyBudsBattIndicator.disable();
+				} else {
+					this.btGalxyBudsBattIndicator.enable(device.mac);
+				}
 			}
         });
 
@@ -109,9 +117,11 @@ class GalaxyBudsBattery {
 
 Utils.addSignalsHelperMethods(GalaxyBudsBattery.prototype);
 
+let galaxyBudsBattery ;
+
 function enable() {
 	Log("Extension enabled");
-	let galaxyBudsBattery = new GalaxyBudsBattery();
+	galaxyBudsBattery = new GalaxyBudsBattery();
 	galaxyBudsBattery.enable();
 }
 

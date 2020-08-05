@@ -56,8 +56,8 @@ var budsBattIndicator = new Lang.Class({
 		});
 		hbox.add_child(this.buttonText);
 		this.add_child(hbox);
-		this.case = new PopupMenu.PopupMenuItem("");
-		this.buds = new PopupMenu.PopupMenuItem("");
+		this.case = new PopupMenu.PopupMenuItem("",{reactive : false});
+		this.buds = new PopupMenu.PopupMenuItem("",{reactive : false});
 		this.buds.add_child(new St.Icon({
 			gicon : Gio.icon_new_for_string(imports.misc.extensionUtils.getCurrentExtension().path+"/icons/left.svg"),
 			icon_size : 32,

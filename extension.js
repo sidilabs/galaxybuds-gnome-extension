@@ -102,10 +102,8 @@ class GalaxyBudsBattery {
 	
 	_destroy() {
         this._disconnectSignals();
-        this._disconnectIdleMonitor();
         if (this._controller)
 			this._controller.destroy();
-
 		Mainloop.source_remove(event);
 		this.event = null;
 

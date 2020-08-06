@@ -127,10 +127,8 @@ var budsBattIndicator = new Lang.Class({
 	},
 
 	reset : function (){
-		this.rightBud.destroy();
-		this.leftBud.destroy();
+		this.buds.destroy();
 		this.case.destroy();
-		this.buttonText.destroy();
 	},
 	
 	

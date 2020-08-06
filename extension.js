@@ -32,6 +32,10 @@ class GalaxyBudsBattery {
 	}
 
 	enable() {
+		if (this.btGalxyBudsBattIndicator == null)
+			this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
+		if (this._controller == null)
+			this._controller = new Bluetooth.BluetoothController();
 		this._connectControllerSignals();
 		this._controller.enable();
 	}
@@ -102,12 +106,15 @@ class GalaxyBudsBattery {
 	
 	_destroy() {
         this._disconnectSignals();
-        if (this._controller)
+        if (this._controller){
 			this._controller.destroy();
-
-		this.btGalxyBudsBattIndicator.reset();
-		this.btGalxyBudsBattIndicator.destroy();
-		this.btGalxyBudsBattIndicator = null;
+			this._controller = null;
+		}
+		if (this.btGalxyBudsBattIndicator){ 
+			this.btGalxyBudsBattIndicator.reset();
+			this.btGalxyBudsBattIndicator.destroy();
+			this.btGalxyBudsBattIndicator = null;
+		}
     }
 }
 

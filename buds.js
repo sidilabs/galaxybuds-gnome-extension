@@ -5,6 +5,7 @@ const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
+const DEBUG = true;
 
 function execCommunicate(argv) {
     let flags = (Gio.SubprocessFlags.STDOUT_PIPE |
@@ -87,18 +88,20 @@ var budsBattIndicator = new Lang.Class({
 	},
 
 	enable(macAdress){
+		Log("Enable budsBattIndicator");
 		if (!this.enabled) {
 			this.show();
+			this.enabled = true;
 			this.syncBattery(macAdress);
 			this.event = GLib.timeout_add_seconds(0, 180,  () => {
 				this.syncBattery(macAdress);
 				return true;
 			});
-			this.enabled = true;
 		}
 	},
 
 	disable(){
+		Log("Disable budsBattIndicator");
 		if (this.enabled){
 			this.hide();
 			GLib.Source.remove(this.event);
@@ -107,33 +110,39 @@ var budsBattIndicator = new Lang.Class({
 	},
 
 	syncBattery : function(macAdress) {
-		let argv = [imports.misc.extensionUtils.getCurrentExtension().path+"/buds_battery.py", macAdress+''];
-		execCommunicate(argv).then(result => {
-			var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
-			[leftBatt, rightBatt, caseBatt] = result.split(','); 
-			this.leftLabel.set_text(leftBatt + "%");
-			this.rightLabel.set_text(rightBatt + "%");
-			this.caseLabel.set_text(caseBatt.trimEnd() + "%");
-			if (parseInt(rightBatt) <= parseInt(leftBatt)){
-				this.buttonText.set_text(rightBatt + "%");
-			} else {
-				this.buttonText.set_text(leftBatt + "%");
-			}
-			
-		}).catch (e => {
-			Log(e);
-			this.hide();
-		});
+		if (this.enabled) {
+			Log("Sync budsBattIndicator");
+			let argv = [imports.misc.extensionUtils.getCurrentExtension().path+"/buds_battery.py", macAdress+''];
+			execCommunicate(argv).then(result => {
+				var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
+				[leftBatt, rightBatt, caseBatt] = result.split(','); 
+				
+				this.leftLabel.set_text(leftBatt + "%");
+				this.rightLabel.set_text(rightBatt + "%");
+				this.caseLabel.set_text(caseBatt.trimEnd() + "%");
+				if (parseInt(rightBatt) <= parseInt(leftBatt)){
+					this.buttonText.set_text(rightBatt + "%");
+				} else {
+					this.buttonText.set_text(leftBatt + "%");
+				}
+				
+			}).catch (e => {
+				Log(e);
+				this.hide();
+			});
+		}
 	},
 
 	reset : function (){
-		//this.buds.destroy();
-		//this.case.destroy();
+		Log("Reset budsBattIndicator");
+		this.buds.destroy();
+		this.case.destroy();
 	},
 	
 	
 });
 
 var Log = function(msg) {
-	log ("[budsBattery] " + msg);
+	if (DEBUG)
+		log ("[budsBattery] " + msg);
 }

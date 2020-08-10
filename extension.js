@@ -45,16 +45,7 @@ class GalaxyBudsBattery {
         this._destroy();
     }
 
-    test() {
-        try {
-            GLib.spawn_command_line_sync("bluetoothctl --version");
-            Log('Test succeeded');
-        } catch (error) {
-            Main.notifyError(_('Bluetooth quick connect'), _(`Error trying to execute "bluetoothctl"`));
-        }
-    }
-
-    _connectControllerSignals() {
+	_connectControllerSignals() {
         Log('Connecting bluetooth controller signals');
 
         this._connectSignal(this._controller, 'device-inserted', (ctrl, device) => {
@@ -111,6 +102,7 @@ class GalaxyBudsBattery {
 			this._controller = null;
 		}
 		if (this.btGalxyBudsBattIndicator){ 
+			this.btGalxyBudsBattIndicator.reset();
 			this.btGalxyBudsBattIndicator.destroy();
 			this.btGalxyBudsBattIndicator = null;
 		}

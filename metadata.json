@@ -1,10 +1,10 @@
 {
-  "description": "Galaxy Buds+ battery indicator.",
-  "name": "Galaxy Buds+ Battery",
+  "description": "Galaxy Buds battery indicator.",
+  "name": "Galaxy Buds Battery",
   "shell-version": [
     "3.36"
   ],
   "url": "https://github.com/pemmoura/galaxybuds-gnome-extension",
   "uuid": "galaxy-buds-battery@pemmoura",
-  "version": 1
+  "version": 2
 }

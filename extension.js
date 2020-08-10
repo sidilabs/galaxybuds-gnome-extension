@@ -111,7 +111,6 @@ class GalaxyBudsBattery {
 			this._controller = null;
 		}
 		if (this.btGalxyBudsBattIndicator){ 
-			this.btGalxyBudsBattIndicator.reset();
 			this.btGalxyBudsBattIndicator.destroy();
 			this.btGalxyBudsBattIndicator = null;
 		}

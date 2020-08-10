@@ -110,7 +110,7 @@ var budsBattIndicator = new Lang.Class({
 		let argv = [imports.misc.extensionUtils.getCurrentExtension().path+"/buds_battery.py", macAdress+''];
 		execCommunicate(argv).then(result => {
 			var [leftBatt, rightBatt, caseBatt] = ["N/A","N/A","N/A"];
-			[rightBatt, leftBatt, caseBatt] = result.split(','); 
+			[leftBatt, rightBatt, caseBatt] = result.split(','); 
 			this.leftLabel.set_text(leftBatt + "%");
 			this.rightLabel.set_text(rightBatt + "%");
 			this.caseLabel.set_text(caseBatt.trimEnd() + "%");
@@ -127,8 +127,8 @@ var budsBattIndicator = new Lang.Class({
 	},
 
 	reset : function (){
-		this.buds.destroy();
-		this.case.destroy();
+		//this.buds.destroy();
+		//this.case.destroy();
 	},
 	
 	

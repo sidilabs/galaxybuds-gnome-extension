@@ -12,7 +12,6 @@ function execCommunicate(argv) {
                  Gio.SubprocessFlags.STDERR_PIPE);
 
     let proc = Gio.Subprocess.new(argv, flags);
-
     return new Promise((resolve, reject) => {
         proc.communicate_utf8_async(null, null, (proc, res) => {
             try {

@@ -120,6 +120,8 @@ var budsBattIndicator = new Lang.Class({
 				this.rightLabel.set_text(rightBatt + "%");
 				if (typeof caseBatt !== 'undefined') {
 					this.caseLabel.set_text(caseBatt.trimEnd() + "%");
+				} else {
+					this.case.hide();
 				}
 				if (parseInt(rightBatt) <= parseInt(leftBatt)){
 					this.buttonText.set_text(rightBatt + "%");

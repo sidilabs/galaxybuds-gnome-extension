@@ -106,9 +106,12 @@ def main():
 
     if verbose:
         print("Checking device model...")
-    isplus = "Buds+" in str(bluetooth.lookup_name(args.mac[0]))
+
+    device_name = str(bluetooth.lookup_name(args.mac[0]))
+    isplus = "Buds Live" in device_name or "Buds+" in device_name
+
     if verbose:
-        print(str(bluetooth.lookup_name(args.mac[0])))
+        print(device_name)
 
     if verbose:
         print("Searching for the RFCOMM interface...")

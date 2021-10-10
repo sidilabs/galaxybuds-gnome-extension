@@ -123,9 +123,13 @@ var budsBattIndicator = new Lang.Class({
 				} else {
 					this.case.hide();
 				}
-				if (parseInt(rightBatt) <= parseInt(leftBatt)){
+				if (parseInt(rightBatt) == 0) {
+					this.buttonText.set_text(leftBatt + "%");
+				} else if (parseInt(leftBatt) == 0) { 
 					this.buttonText.set_text(rightBatt + "%");
-				} else {
+			    } else if (parseInt(rightBatt) <= parseInt(leftBatt)){
+					this.buttonText.set_text(rightBatt + "%");
+				} else  {
 					this.buttonText.set_text(leftBatt + "%");
 				}
 				

@@ -151,3 +151,5 @@ var Log = function(msg) {
   if (DEBUG)
     log ("[budsBattery] " + msg);
 }
+
+export {budsBattIndicator, Log};

@@ -49,3 +49,5 @@ function addSignalsHelperMethods(prototype) {
     this._signals = [];
   };
 }
+
+export {addSignalsHelperMethods, spawn};

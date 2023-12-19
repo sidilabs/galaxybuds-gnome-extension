@@ -105,3 +105,5 @@ var BluetoothDevice = class {
     Utils.spawn(`bluetoothctl -- disconnect ${this.mac} && sleep 7 && bluetoothctl -- connect ${this.mac}`)
   }
 }
+
+export {BluetoothController};

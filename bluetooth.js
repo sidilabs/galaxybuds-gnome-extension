@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import GnomeBluetooth from 'gi://GnomeBluetooth';
-//import Signals from "signals";
 import GLib from 'gi://GLib';
 import * as Utils from "./utils.js";
 

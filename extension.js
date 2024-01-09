@@ -25,11 +25,11 @@ import * as Utils from "./utils.js";
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export default class GalaxyBudsBattery extends Extension {
-  /*constructor(metadata) {
+  constructor(metadata) {
     super(metadata);
     this._controller = new Bluetooth.BluetoothController();
     this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
-  }*/
+  }
 
   enable() {
     log("Testing stuff")

@@ -15,9 +15,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import GnomeBluetooth from 'gi://GnomeBluetooth';
-const Signals = imports.signals; // legacy module without ESM equivalent
+//import Signals from "signals";
 import GLib from 'gi://GLib';
 import * as Utils from "./utils.js";
+
+const Signals = imports.signals; // legacy module without ESM equivalent
 
 var BluetoothController = class {
   constructor() {

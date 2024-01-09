@@ -15,21 +15,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************/
-import {* as buds, Log} from "./buds.js";
 import GLib from 'gi://GLib';
+import * as buds from "./buds.js";
 //const Mainloop = imports.mainloop;
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import * as Bluetooth from "./bluetooth.js";
 import * as Utils from "./utils.js";
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-class GalaxyBudsBattery {
-  constructor() {
+export default class GalaxyBudsBattery extends Extension {
+  /*constructor(metadata) {
+    super(metadata);
     this._controller = new Bluetooth.BluetoothController();
     this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
-  }
+  }*/
 
   enable() {
+    log("Testing stuff")
+    this._controller = new Bluetooth.BluetoothController();
+    this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
     if (this.btGalxyBudsBattIndicator == null)
       this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
     if (this._controller == null)
@@ -39,16 +44,16 @@ class GalaxyBudsBattery {
   }
 
   disable() {
-    Log('Disabling extension');
+    buds.Log('Disabling extension');
     this._destroy();
   }
 
   _connectControllerSignals() {
-    Log('Connecting bluetooth controller signals');
+    buds.Log('Connecting bluetooth controller signals');
 
     this._connectSignal(this._controller, 'device-inserted', (ctrl, device) => {
       if (device.name.includes("Galaxy Buds")){
-        Log("Buds inserted event MAC="+device.mac);
+        buds.Log("Buds inserted event MAC="+device.mac);
         if (!device.isConnected){
           this.btGalxyBudsBattIndicator.disable();
         } else {
@@ -58,9 +63,9 @@ class GalaxyBudsBattery {
     });
 
     this._connectSignal(this._controller, 'device-changed', (ctrl, device) => {
-      Log(`Device changed event: ${device.name}`);
+      buds.Log(`Device changed event: ${device.name}`);
       if (device.name.includes("Galaxy Buds")){
-        Log(`Buds changed event`);
+        buds.Log(`Buds changed event`);
         if (!device.isConnected){
           this.btGalxyBudsBattIndicator.disable();
         } else {
@@ -72,7 +77,7 @@ class GalaxyBudsBattery {
     this._connectSignal(this._controller, 'device-deleted', () => {
 
       if (device.name.includes("Galaxy Buds")){
-        Log(`Buds deleted event`);
+        buds.Log(`Buds deleted event`);
         if (!device.isConnected){
           this.btGalxyBudsBattIndicator.disable();
         } else {
@@ -108,16 +113,3 @@ class GalaxyBudsBattery {
 }
 
 Utils.addSignalsHelperMethods(GalaxyBudsBattery.prototype);
-
-let galaxyBudsBattery ;
-
-function enable() {
-  Log("Extension enabled");
-  galaxyBudsBattery = new GalaxyBudsBattery();
-  galaxyBudsBattery.enable();
-}
-
-function disable() {
-  Log("Extension disabled");
-  galaxyBudsBattery.disable();
-}

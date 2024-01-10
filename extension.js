@@ -28,15 +28,12 @@ export default class GalaxyBudsBattery extends Extension {
   constructor(metadata) {
     super(metadata);
     this._controller = new Bluetooth.BluetoothController();
-    this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
+    this.btGalxyBudsBattIndicator = new buds.budsBattIndicator(this.path);
   }
 
   enable() {
-    log("Testing stuff")
-    this._controller = new Bluetooth.BluetoothController();
-    this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
     if (this.btGalxyBudsBattIndicator == null)
-      this.btGalxyBudsBattIndicator = new buds.budsBattIndicator();
+      this.btGalxyBudsBattIndicator = new buds.budsBattIndicator(this.path);
     if (this._controller == null)
       this._controller = new Bluetooth.BluetoothController();
     this._connectControllerSignals();

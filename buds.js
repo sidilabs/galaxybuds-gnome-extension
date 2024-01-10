@@ -43,7 +43,7 @@ var budsBattIndicator = GObject.registerClass({
     this.path = extensionPath
     this.statusArray = [0,0,"N/A", "N/A", "N/A"];
     //Creating the main icon
-    var hbox = new St.BoxLayout({style_class: 'panel-status-menu-box bt-buds-batt-hbox',x_expand: true});
+    var hbox = new St.BoxLayout({style_class: 'panel-status-menu-box bt-buds-batt-hbox'});
     //Icon
     this.icon = new St.Icon({ gicon: Gio.icon_new_for_string(extensionPath + "/icons/buds.svg"), style_class: 'system-status-icon', icon_size: 16 });
     hbox.add_child(this.icon);

@@ -168,8 +168,9 @@ var budsBattIndicator = GObject.registerClass({
           this.case.hide();
         }
 
-        //Find a better way to choose the main battery displayed
-        if(this.statusArray[2]>this.statusArray[3]){
+        //Setting the battery for the main icon
+        let onStates = [2,3]
+        if(this.statusArray[2]>this.statusArray[3] && onStates.includes(this.statusArray[0]){
           this.buttonText.set_text(this.statusArray[2] + "%");
         }else{
           this.buttonText.set_text(this.statusArray[3] + "%");
@@ -188,9 +189,9 @@ var budsBattIndicator = GObject.registerClass({
   }
 });
 
-var Log = function(msg) {
-  if (DEBUG)
-    log ("[budsBattery] " + msg);
-}
+      var Log = function(msg) {
+        if (DEBUG)
+          log ("[budsBattery] " + msg);
+      }
 
-export {budsBattIndicator, Log};
+      export {budsBattIndicator, Log};

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-A python script to get battery level from Samsung Galaxy Buds(+) devices
+A python script to get battery level from Samsung Galaxy Buds devices
 """
 
 # License: MIT
@@ -20,23 +20,49 @@ def print_result(string, timestamp):
     global msg_debounce
     if msg_debounce != string:
         if timestamp:
-            print(string + "," + datetime.datetime.now().strftime("%FT%T.%f")[:-4] + "Z")
+            print(string + "," +
+                  datetime.datetime.now().strftime("%FT%T.%f")[:-4] + "Z")
         else:
             print(string)
         msg_debounce = string
 
 
-def parse_message(data, isplus, timestamp):
-    if data[0] != (0xFD if isplus else 0xFE):
+def parse_gnome(data, islegacy):
+    if data[0] != (0xFE if islegacy else 0xFD):
         print("Invalid SOM")
         exit(2)
     if data[3] == 97:
-        if isplus:
+        state = data[10]
+        if not islegacy:
+            string = "{},{},{},{},{}".format(
+                (state & 240) >> 4, state & 15, data[6], data[7], data[11])
+        else:
+            string = "{},{}".format(data[6], data[7])
+    elif data[3] == 96:
+        state = data[9]
+        if not islegacy:
+            string = "{},{},{},{},{}".format(
+                (state & 240) >> 4, state & 15, data[5], data[6], data[10])
+        else:
+            string = "{},{}".format(data[5], data[6])
+    else:
+        return False
+
+    print(string)
+    return True
+
+
+def parse_message(data, islegacy, timestamp):
+    if data[0] != (0xFE if islegacy else 0xFD):
+        print("Invalid SOM")
+        exit(2)
+    if data[3] == 97:
+        if not islegacy:
             string = "{},{},{}".format(data[6], data[7], data[11])
         else:
             string = "{},{}".format(data[6], data[7])
     elif data[3] == 96:
-        if isplus:
+        if not islegacy:
             string = "{},{},{}".format(data[5], data[6], data[10])
         else:
             string = "{},{}".format(data[5], data[6])
@@ -46,9 +72,9 @@ def parse_message(data, isplus, timestamp):
     return True
 
 
-def parse_message_wear_status(data, isplus, timestamp):
+def parse_message_wear_status(data, islegacy, timestamp):
     global msg_debounce
-    if data[0] != (0xFD if isplus else 0xFE):
+    if data[0] != (0xFE if islegacy else 0xFD):
         print("Invalid SOM")
         exit(2)
     if data[3] == 97:
@@ -58,7 +84,7 @@ def parse_message_wear_status(data, isplus, timestamp):
     else:
         return False
 
-    if isplus:
+    if not islegacy:
         left = id_to_placement((state & 240) >> 4)
         right = id_to_placement(state & 15)
         string = "{},{}".format(left, right)
@@ -92,41 +118,56 @@ def id_to_placement(id):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Read battery values of the Samsung Galaxy Buds or Buds+ '
-                                                 '[Left, Right, Case (Buds+)]')
+    parser = argparse.ArgumentParser(description='Read battery values of the Samsung Galaxy Buds, Buds+, Buds Live or Buds Pro'
+                                                 '[Left, Right, Case (Buds+ or later)]')
     parser.add_argument('mac', metavar='mac-address', type=str, nargs=1,
                         help='MAC-Address of your Buds')
-    parser.add_argument('-m', '--monitor', action='store_true', help="Notify on change")
-    parser.add_argument('-t', '--monitor-timestamp', action='store_true', help="Notify on change and print timestamps")
-    parser.add_argument('-w', '--wearing-status', action='store_true', help="Print wearing status instead")
-    parser.add_argument('-v', '--verbose', action='store_true', help="Print debug information")
+    parser.add_argument('-m', '--monitor',
+                        action='store_true', help="Notify on change")
+    parser.add_argument('-t', '--timestamp', action='store_true',
+                        help="Print timestamps")
+    parser.add_argument('-w', '--wearing-status',
+                        action='store_true', help="Print wearing status instead")
+    parser.add_argument('-g', '--gnome', action='store_true',
+                        help="Print battery values and wearing status to be used with the Gnome extension")
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help="Print debug information")
     args = parser.parse_args()
 
     verbose = args.verbose
 
     if verbose:
         print("Checking device model...")
-
-    device_name = str(bluetooth.lookup_name(args.mac[0]))
-    isplus = "Buds Live" in device_name or "Buds+" in device_name
+    islegacy = "Galaxy Buds (" in str(bluetooth.lookup_name(args.mac[0]))
 
     if verbose:
-        print(device_name)
+        print(str(bluetooth.lookup_name(args.mac[0])))
+        print("Searching for RFCOMM interface...")
 
-    if verbose:
-        print("Searching for the RFCOMM interface...")
-    uuid = ("00001101-0000-1000-8000-00805F9B34FB" if isplus else "00001102-0000-1000-8000-00805f9b34fd")
-    service_matches = bluetooth.find_service(uuid=uuid, address=str(args.mac[0]))
+    uuid = ("00001101-0000-1000-8000-00805F9B34FB" if not islegacy else "00001102-0000-1000-8000-00805f9b34fd")
+    service_matches = bluetooth.find_service(
+        uuid=uuid, address=str(args.mac[0]))
 
-    if len(service_matches) == 0:
+    port = host = None
+    for match in service_matches:
+        target_name = ""
+        if isinstance(match["name"], str):
+            target_name = "GEARMANAGER"
+        else:
+            target_name = b"GEARMANAGER"
+
+        if target_name in match["name"]:
+            port = match["port"]
+            host = match["host"]
+            break
+
+    if port is None or host is None:
         print("Couldn't find the proprietary RFCOMM service")
         sys.exit(1)
 
-    port = service_matches[0]["port"]
-    host = service_matches[0]["host"]
-
     if verbose:
         print("RFCOMM interface found. Establishing connection...")
+
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     sock.connect((host, port))
 
@@ -139,11 +180,14 @@ def main():
             if len(data) == 0:
                 break
             if args.wearing_status:
-                success = parse_message_wear_status(data, isplus, args.monitor_timestamp)
+                success = parse_message_wear_status(
+                    data, islegacy, args.timestamp)
+            elif args.gnome:
+                success = parse_gnome(data, islegacy)
             else:
-                success = parse_message(data, isplus, args.monitor_timestamp)
+                success = parse_message(data, islegacy, args.timestamp)
 
-            if success and not args.monitor and not args.monitor_timestamp:
+            if success and not args.monitor:
                 exit(0)
 
     except IOError:

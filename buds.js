@@ -7,6 +7,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 const DEBUG = true;
 
 function execCommunicate(argv) {
@@ -43,7 +44,7 @@ var budsBattIndicator = GObject.registerClass({
     super(0.0, "btGalaxyBudsBattIndicator");
     this.batteryStatusArray = ["N/A", "N/A", "N/A"];
     var hbox = new St.BoxLayout({style_class: 'panel-status-menu-box bt-buds-batt-hbox'});
-    this.icon = new St.Icon({ gicon: Gio.icon_new_for_string("/home/biche/Documents/gnome-extensions/galaxybuds-gnome-extension/icons/logo.svg"), style_class: 'system-status-icon', icon_size: 16 });
+    this.icon = new St.Icon({ gicon: Gio.icon_new_for_string(Extension.path + "/icons/buds.svg"), style_class: 'system-status-icon', icon_size: 16 });
     hbox.add_child(this.icon);
 
     this.buttonText = new St.Label({
@@ -56,7 +57,7 @@ var budsBattIndicator = GObject.registerClass({
     this.case = new PopupMenu.PopupMenuItem("", {reactive: false});
     this.buds = new PopupMenu.PopupMenuItem("", {reactive: false});
     this.buds.add_child(new St.Icon({
-      gicon: Gio.icon_new_for_string("/home/biche/Documents/gnome-extensions/galaxybuds-gnome-extension/icons/logo.svg"),
+      gicon: Gio.icon_new_for_string(Extension.path + "/icons/left.svg"),
       icon_size: 32,
     }));
     this.leftLabel = new St.Label({text: 'NA%', y_align: Clutter.ActorAlign.CENTER, });
@@ -65,12 +66,12 @@ var budsBattIndicator = GObject.registerClass({
     this.rightLabel = new St.Label({text: 'NA%', y_align: Clutter.ActorAlign.CENTER, });
     this.buds.add_child(this.rightLabel);
     this.buds.add_child(new St.Icon({
-      gicon: Gio.icon_new_for_string("/home/biche/Documents/gnome-extensions/galaxybuds-gnome-extension/icons/logo.svg"),
+      gicon: Gio.icon_new_for_string(Extension.path + "/icons/right.svg"),
       icon_size: 32,
     }));
     this.case.add_child(new St.Label({text: '       ', y_align: Clutter.ActorAlign.CENTER, }));
     this.case.add_child(new St.Icon({
-      gicon: Gio.icon_new_for_string("/home/biche/Documents/gnome-extensions/galaxybuds-gnome-extension/icons/logo.svg"),
+      gicon: Gio.icon_new_for_string(Extension.path + "/icons/case.svg"),
       icon_size: 45,
       y_align: Clutter.ActorAlign.CENTER,
     }));
@@ -78,7 +79,7 @@ var budsBattIndicator = GObject.registerClass({
     this.case.add_child(this.caseLabel);
     this.menu.addMenuItem(this.buds);
     this.menu.addMenuItem(this.case);
-    //Main.panel.addToStatusArea('BtGalaxyBudsBattIndicator', this, 1);
+    Main.panel.addToStatusArea('BtGalaxyBudsBattIndicator', this, 1);
     this.hide();
     this.enabled = false;
   }
@@ -108,7 +109,7 @@ var budsBattIndicator = GObject.registerClass({
   syncBattery(macAddress) {
     if (this.enabled) {
       Log("Sync budsBattIndicator");
-      let argv = ["./buds_battery.py", macAddress + ''];
+      let argv = [Extension.path + "/buds_battery.py", macAddress + ''];
       execCommunicate(argv).then(result => {
         var [leftBatt, rightBatt, caseBatt] = ["N/A", "N/A", "N/A"];
         [leftBatt, rightBatt, caseBatt] = result.split(',');

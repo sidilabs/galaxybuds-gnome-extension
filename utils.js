@@ -14,38 +14,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const GLib = imports.gi.GLib;
+import GLib from 'gi://GLib';
 
 function spawn(command, callback) {
-    let [status, pid] = GLib.spawn_async(
-        null,
-        ['/usr/bin/env', 'bash', '-c', command],
-        null,
-        GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-        null
-    );
+  let [status, pid] = GLib.spawn_async(
+    null,
+    ['/usr/bin/env', 'bash', '-c', command],
+    null,
+    GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+    null
+  );
 
-    if (callback)
-        GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, callback);
+  if (callback)
+    GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, callback);
 }
 
 function addSignalsHelperMethods(prototype) {
-    prototype._connectSignal = function (subject, signal_name, method) {
-        if (!this._signals) this._signals = [];
+  prototype._connectSignal = function (subject, signal_name, method) {
+    if (!this._signals) this._signals = [];
 
-        let signal_id = subject.connect(signal_name, method);
-        this._signals.push({
-            subject: subject,
-            signal_id: signal_id
-        });
-    }
+    let signal_id = subject.connect(signal_name, method);
+    this._signals.push({
+      subject: subject,
+      signal_id: signal_id
+    });
+  }
 
-    prototype._disconnectSignals = function () {
-        if (!this._signals) return;
+  prototype._disconnectSignals = function () {
+    if (!this._signals) return;
 
-        this._signals.forEach((signal) => {
-            signal.subject.disconnect(signal.signal_id);
-        });
-        this._signals = [];
-    };
+    this._signals.forEach((signal) => {
+      signal.subject.disconnect(signal.signal_id);
+    });
+    this._signals = [];
+  };
 }
+
+export {addSignalsHelperMethods, spawn};
